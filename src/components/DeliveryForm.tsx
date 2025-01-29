@@ -33,7 +33,7 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit }) => {
             payload: { name: e.target.value } 
           })}
           required
-          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
         />
         <input
           type="text"
@@ -44,7 +44,7 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit }) => {
             payload: { address: e.target.value } 
           })}
           required
-          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
         />
         <input
           type="tel"
@@ -55,11 +55,11 @@ export const DeliveryForm: React.FC<DeliveryFormProps> = ({ onSubmit }) => {
             payload: { phone: e.target.value } 
           })}
           required
-          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
         />
         <button
           type="submit"
-          className="w-full p-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all shadow-lg flex items-center justify-center gap-2"
+          className="w-full p-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all shadow-lg flex items-center justify-center gap-2"
         >
           <ShoppingBag className="w-4 h-4" />
           Continue to Payment (${total})

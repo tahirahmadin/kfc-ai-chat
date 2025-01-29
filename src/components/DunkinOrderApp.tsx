@@ -9,6 +9,7 @@ import { CartSummary } from "./CartSummary";
 import { QueryType } from "../context/ChatContext";
 import { menuItems } from "../data/menuData";
 import { ImageService } from "../services/imageService";
+import { SpeechService, SpeechRecognitionResult } from '../services/speechService';
 import axios from "axios";
 const chatService = new ChatService();
 
@@ -25,6 +26,9 @@ export const DunkinOrderApp: React.FC = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isImageAnalyzing, setIsImageAnalyzing] = useState(false);
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const speechService = useMemo(() => new SpeechService(), []);
 
   // Replace with your DeepSeek API endpoint and API key
   const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"; // Example endpoint
@@ -110,6 +114,128 @@ export const DunkinOrderApp: React.FC = () => {
       });
     } finally {
       setIsImageAnalyzing(false);
+    }
+  };
+
+  const handleSpeechRecognition = async (result: SpeechRecognitionResult) => {
+    if (!result.isFinal) {
+      setInterimTranscript(result.transcript);
+      return;
+    }
+  
+    try {
+      speechService.stopListening();
+      setIsSpeechEnabled(false);
+      setInterimTranscript('');
+      
+      const transcript = result.transcript.trim();
+      if (!transcript) return;
+  
+      const queryType = chatService.determineQueryType(transcript);
+  
+      dispatch({
+        type: "ADD_MESSAGE",
+        payload: {
+          id: Date.now(),
+          text: transcript,
+          isBot: false,
+          time: new Date().toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          }),
+          queryType,
+        },
+      });
+  
+      dispatch({ type: "SET_LOADING", payload: true });
+  
+      // Simpler prompt to reduce token count
+      const prompt = `Here is the menu data: ${JSON.stringify(
+        menuItems
+      )}. Based on this, answer the user's query: ${transcript}. Return the response in the format strictly - { "text": "", "items": [{ "id": number, "name": string, "price": string }],"conclusion":"" }, where "text" is a creative/cleaver/funny information related to user query - in around 25 words and "items" is an array of matching menu items with only id, name, and price and "conclusion" is final short creative remark. Include a maximum of 6 items and minimum 2 items - but be flexible with items count based on requirements,if you find this is a greeting message from the user, like hey, how are you , hi etc or anything that is out of the menu reply accordingly and set "items" to [],also ignore menu items in that case and "conclusion" shoudl be "". Do not include any additional text or explanations or format type in response.`;
+      
+  
+      const response = await axios.post(
+        OPENAI_API_URL,
+        {
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: 2000,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${OPENAI_KEY}`,
+          },
+        }
+      );
+  
+      dispatch({
+        type: "ADD_MESSAGE",
+        payload: {
+          id: Date.now() + 1,
+          text: response.data.choices[0].message.content,
+          isBot: true,
+          time: new Date().toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          }),
+          queryType,
+        },
+      });
+  
+    } catch (error) {
+      console.error('Error:', error);
+      dispatch({
+        type: "ADD_MESSAGE",
+        payload: {
+          id: Date.now() + 1,
+          text: "Please try that again.",
+          isBot: true,
+          time: new Date().toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          }),
+          queryType: QueryType.GENERAL,
+        },
+      });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
+    }
+  };
+  
+  // Function to toggle speech recognition
+  const toggleSpeechRecognition = () => {
+    if (isSpeechEnabled) {
+      speechService.stopListening();
+      setIsSpeechEnabled(false);
+      setInterimTranscript('');
+    } else {
+      setIsSpeechEnabled(true);
+      speechService.startListening(
+        handleSpeechRecognition,
+        (error) => {
+          console.error(error);
+          setIsSpeechEnabled(false);
+          dispatch({
+            type: "ADD_MESSAGE",
+            payload: {
+              id: Date.now(),
+              text: "Sorry, there was an error with speech recognition. Please try again.",
+              isBot: true,
+              time: new Date().toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+              }),
+              queryType: QueryType.GENERAL,
+            },
+          });
+        }
+      );
     }
   };
 
@@ -405,6 +531,9 @@ export const DunkinOrderApp: React.FC = () => {
           isImageAnalyzing={isImageAnalyzing}
           isLoading={state.isLoading}
           queryType={state.currentQueryType}
+          isSpeechEnabled={isSpeechEnabled}
+          onSpeechToggle={toggleSpeechRecognition}
+          interimTranscript={interimTranscript}
         />
         <CartSummary />
       </div>
@@ -420,7 +549,7 @@ export const DunkinOrderApp: React.FC = () => {
       {isCartOpen && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-slide-up">
-            <div className="p-4 bg-orange-50 border-b flex justify-between items-center">
+            <div className="p-4 bg-red-50 border-b flex justify-between items-center">
               <h2 className="font-semibold text-gray-800">Your Cart</h2>
               <button
                 onClick={() => setIsCartOpen(false)}
@@ -478,7 +607,7 @@ export const DunkinOrderApp: React.FC = () => {
               <div className="p-4 border-t">
                 <div className="flex justify-between mb-4">
                   <span className="font-medium">Total</span>
-                  <span className="font-bold text-orange-500">
+                  <span className="font-bold text-red-500">
                     $
                     {state.cart
                       .reduce(
@@ -494,7 +623,7 @@ export const DunkinOrderApp: React.FC = () => {
                     setIsCartOpen(false);
                     dispatch({ type: "SET_CHECKOUT_STEP", payload: "details" });
                   }}
-                  className="w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                  className="w-full py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                 >
                   Proceed to Checkout
                 </button>

@@ -40,7 +40,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           required
           value={orderDetails.name}
           onChange={(e) => setOrderDetails({ ...orderDetails, name: e.target.value })}
-          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
         />
         <input
           type="text"
@@ -48,7 +48,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           required
           value={orderDetails.address}
           onChange={(e) => setOrderDetails({ ...orderDetails, address: e.target.value })}
-          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
         />
         <input
           type="tel"
@@ -56,11 +56,11 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           required
           value={orderDetails.phone}
           onChange={(e) => setOrderDetails({ ...orderDetails, phone: e.target.value })}
-          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
         />
         <button
           type="submit"
-          className="w-full p-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+          className="w-full p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
         >
           Continue to Payment
         </button>
@@ -78,18 +78,18 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         <ArrowLeft className="w-4 h-4" />
         Back to Menu
       </button>
-      <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-4 rounded-2xl text-white shadow-lg">
+      <div className="bg-gradient-to-br from-red-500 to-red-600 p-4 rounded-2xl text-white shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-orange-100 text-sm">Total Amount</p>
+            <p className="text-red-100 text-sm">Total Amount</p>
             <p className="text-2xl font-bold">${total}</p>
           </div>
-          <CreditCard className="w-8 h-8 text-orange-200" />
+          <CreditCard className="w-8 h-8 text-red-200" />
         </div>
         <div className="space-y-1">
-          <p className="text-sm text-orange-100">Delivery to:</p>
+          <p className="text-sm text-red-100">Delivery to:</p>
           <p className="font-medium">{orderDetails.name}</p>
-          <p className="text-sm text-orange-100">{orderDetails.address}</p>
+          <p className="text-sm text-red-100">{orderDetails.address}</p>
         </div>
       </div>
       <input
@@ -98,7 +98,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
         required
         value={orderDetails.cardNumber}
         onChange={(e) => setOrderDetails({ ...orderDetails, cardNumber: e.target.value })}
-        className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
       />
       <div className="grid grid-cols-2 gap-3">
         <input
@@ -107,7 +107,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           required
           value={orderDetails.expiryDate}
           onChange={(e) => setOrderDetails({ ...orderDetails, expiryDate: e.target.value })}
-          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
         />
         <input
           type="text"
@@ -115,12 +115,12 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
           required
           value={orderDetails.cvv}
           onChange={(e) => setOrderDetails({ ...orderDetails, cvv: e.target.value })}
-          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded-lg bg-white/50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500"
         />
       </div>
       <button
         type="submit"
-        className="w-full p-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all shadow-lg flex items-center justify-center gap-2 mt-4"
+        className="w-full p-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all shadow-lg flex items-center justify-center gap-2 mt-4"
       >
         <ShoppingBag className="w-4 h-4" />
         Pay ${total} and Place Order

@@ -72,7 +72,7 @@ export const Message: React.FC<MessageProps> = ({ message, onRetry }) => {
           </span>
           <button
             onClick={onRetry}
-            className="mt-2 text-sm text-orange-500 hover:text-orange-600 transition-colors"
+            className="mt-2 text-sm text-red-500 hover:text-red-600 transition-colors"
           >
             Try again
           </button>

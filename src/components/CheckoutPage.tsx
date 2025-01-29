@@ -39,7 +39,7 @@ export const CheckoutPage: React.FC = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Your cart is empty</h2>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
           >
             Return to Menu
           </button>
@@ -52,7 +52,7 @@ export const CheckoutPage: React.FC = () => {
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-md mx-auto">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="p-4 bg-orange-50">
+          <div className="p-4 bg-red-50">
             <h1 className="text-2xl font-semibold text-gray-800">
               {step === 'details' ? 'Delivery Details' : 'Payment Information'}
             </h1>

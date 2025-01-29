@@ -9,6 +9,8 @@ import {
   Siren as Fire,
   Vegan,
   Group,
+  Mic,
+  MicOff,
 } from "lucide-react";
 
 interface ChatInputProps {
@@ -20,6 +22,9 @@ interface ChatInputProps {
   className?: string;
   placeholder?: string;
   showQuickActions?: boolean;
+  isSpeechEnabled?: boolean;
+  onSpeechToggle?: () => void;
+  interimTranscript?: string;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -31,6 +36,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   className = "",
   placeholder = "Type a message...",
   showQuickActions = true,
+  isSpeechEnabled = false,
+  onSpeechToggle = () => {},
+  interimTranscript = "",
 }) => {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,9 +53,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   return (
-    <div
-      className={`p-4 border-t border-white/20 bg-white/50 backdrop-blur-sm ${className}`}
-    >
+    <div className={`p-4 border-t border-white/20 bg-white/50 backdrop-blur-sm ${className}`}>
+      {/* Display interim transcript during speech recognition */}
+      {isSpeechEnabled && interimTranscript && (
+        <div className="mb-2 px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-600 italic">
+          {interimTranscript}
+        </div>
+      )}
       <div>
         {showQuickActions && !input && (
           <div className="grid grid-cols-2 gap-1 mb-2 h-[80px]">
@@ -57,7 +69,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               }
               className="flex items-center gap-2 p-2 bg-white/80 rounded-xl hover:bg-white/90 transition-colors text-xs text-gray-700 border border-gray-100"
             >
-              <Fire className="w-4 h-4 text-orange-500" />
+              <Fire className="w-4 h-4 text-red-600" />
               <span className="text-left">
                 <span className="font-medium block">Lunch combo</span>
               </span>
@@ -67,7 +79,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               onClick={() => handleQuickAction("Suggest me veg options?")}
               className="flex items-center gap-2 p-2 bg-white/80 rounded-xl hover:bg-white/90 transition-colors text-xs text-gray-700 border border-gray-100"
             >
-              <Vegan className="w-4 h-4 text-orange-500" />
+              <Vegan className="w-4 h-4 text-red-600" />
               <span className="text-left">
                 <span className="font-medium block">Veg options</span>
               </span>
@@ -77,7 +89,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               onClick={() => handleQuickAction("Suggest me Best combo options")}
               className="flex items-center gap-2 p-2 bg-white/80 rounded-xl hover:bg-white/90 transition-colors text-xs text-gray-700 border border-gray-100"
             >
-              <Group className="w-4 h-4 text-orange-500" />
+              <Group className="w-4 h-4 text-red-600" />
               <span className="text-left">
                 <span className="font-medium block">Best KFC combos</span>
               </span>
@@ -89,7 +101,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
               }
               className="flex items-center gap-2 p-2 bg-white/80 rounded-xl hover:bg-white/90 transition-colors text-xs text-gray-700 border border-gray-100"
             >
-              <Clock className="w-4 h-4 text-orange-500" />
+              <Clock className="w-4 h-4 text-red-600" />
               <span className="text-left">
                 <span className="font-medium block">Chicken burger meal</span>
               </span>
@@ -104,9 +116,27 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           placeholder={placeholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          disabled={isLoading}
-          className="flex-1 p-2 rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-orange-500 backdrop-blur-sm placeholder:text-gray-500 disabled:opacity-50"
+          disabled={isLoading || isSpeechEnabled}
+          className="flex-1 p-2 rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-red-600 backdrop-blur-sm placeholder:text-gray-500 disabled:opacity-50"
         />
+        {/* Add microphone button */}
+        <button
+          type="button"
+          onClick={onSpeechToggle}
+          className={`p-2 rounded-full transition-colors ${
+            isSpeechEnabled
+              ? 'bg-black hover:bg-black'
+              : 'bg-[#cc1c1c] hover:bg-red-600'
+          } text-white`}
+          title={isSpeechEnabled ? "Stop listening" : "Start voice input"}
+        >
+          {isSpeechEnabled ? (
+            <MicOff className="w-5 h-5" />
+          ) : (
+            <Mic className="w-5 h-5" />
+          )}
+        </button>
+        
         <label className="cursor-pointer p-2 bg-[#cc1c1c] hover:bg-red-600 rounded-full text-white transition-colors">
           <input
             type="file"

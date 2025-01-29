@@ -14,6 +14,9 @@ interface ChatPanelProps {
   placeholder: string;
   onImageUpload: (file: File) => void;
   isImageAnalyzing: boolean;
+  isSpeechEnabled?: boolean;
+  onSpeechToggle?: () => void;
+  interimTranscript?: string;
 }
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({
@@ -24,6 +27,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   placeholder,
   isImageAnalyzing,
   isLoading = false,
+  isSpeechEnabled = false,
+  onSpeechToggle = () => {},
+  interimTranscript = '',
 }) => {
   const { state } = useChatContext();
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -160,8 +166,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         <div className="flex-1 flex bg-white/30 backdrop-blur-sm overflow-y-auto">
           {/* Categories Panel */}
           <div className="w-1/3 border-r border-white/20 overflow-y-auto">
-            <div className="p-3 bg-orange-50 border-b border-white/20">
-              <div className="flex items-center gap-2 text-orange-800">
+            <div className="p-3 bg-red-50 border-b border-white/20">
+              <div className="flex items-center gap-2 text-red-800">
                 <Menu className="w-4 h-4" />
                 <span className="font-medium">Categories</span>
               </div>
@@ -171,7 +177,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                 onClick={() => setSelectedCategory(null)}
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                   selectedCategory === null
-                    ? "bg-orange-100 text-orange-800"
+                    ? "bg-red-100 text-red-800"
                     : "hover:bg-gray-100"
                 }`}
               >
@@ -183,7 +189,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                   onClick={() => setSelectedCategory(category)}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                     selectedCategory === category
-                      ? "bg-orange-100 text-orange-800"
+                      ? "bg-red-100 text-red-800"
                       : "hover:bg-gray-100"
                   }`}
                 >
@@ -220,6 +226,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         onImageUpload={onImageUpload}
         placeholder={placeholder}
         isLoading={isLoading}
+        isSpeechEnabled={isSpeechEnabled}
+        onSpeechToggle={onSpeechToggle}
+        interimTranscript={interimTranscript}
       />
     </>
   );

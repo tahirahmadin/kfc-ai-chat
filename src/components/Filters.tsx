@@ -67,7 +67,7 @@ export const Filters: React.FC<FiltersProps> = ({
         <select
           value={peopleCount}
           onChange={(e) => setPeopleCount(Number(e.target.value))}
-          className="bg-white/50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 p-2 pr-8"
+          className="bg-white/50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 p-2 pr-8"
         >
           {[1, 2, 3, 4, 5].map((num) => (
             <option key={num} value={num}>

@@ -72,7 +72,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
           }`}
         >
           <p
-            className={`text-orange-500 font-bold ${
+            className={`text-red-500 font-bold ${
               compact ? "text-[10px]" : "text-xs"
             }`}
           >
@@ -85,8 +85,8 @@ export const MenuItem: React.FC<MenuItemProps> = ({
                 compact ? "p-0.5" : "p-1.5"
               } flex items-center justify-center rounded-full transition-all ${
                 isInCart
-                  ? "bg-orange-500 text-white hover:bg-orange-600 shadow-sm"
-                  : "bg-orange-50 text-orange-600 hover:bg-orange-100"
+                  ? "bg-red-500 text-white hover:bg-red-600 shadow-sm"
+                  : "bg-red-50 text-red-600 hover:bg-red-100"
               }`}
             >
               <Plus className={compact ? "w-3.5 h-3.5" : "w-3.5 h-3.5"} />

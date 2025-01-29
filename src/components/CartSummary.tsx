@@ -68,18 +68,18 @@ export const CartSummary: React.FC = () => {
       <div className="flex flex-col items-end">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition-all shadow-lg mb-2"
+          className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all shadow-lg mb-2"
         >
           <ShoppingBag className="w-4 h-4" />
           <span className="font-medium">{cartTotal} AED</span>
-          <span className="bg-white text-orange-500 px-2 py-0.5 rounded-full text-sm">
+          <span className="bg-white text-red-500 px-2 py-0.5 rounded-full text-sm">
             {state.cart.length}
           </span>
         </button>
 
         {isExpanded && (
           <div className="bg-white rounded-lg shadow-xl w-[calc(100vw-2rem)] sm:w-80 overflow-hidden animate-slide-up">
-            <div className="p-4 bg-orange-50 border-b">
+            <div className="p-4 bg-red-50 border-b">
               <h3 className="font-semibold text-gray-800">Your Cart</h3>
             </div>
             <div className="max-h-96 overflow-y-auto">
@@ -131,13 +131,13 @@ export const CartSummary: React.FC = () => {
             <div className="p-4 bg-white border-t">
               <div className="flex justify-between mb-4">
                 <span className="font-medium text-gray-800">Total</span>
-                <span className="font-bold text-orange-500">
+                <span className="font-bold text-red-500">
                   {cartTotal} AED
                 </span>
               </div>
               <button
                 onClick={handleCheckout}
-                className="w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
               >
                 <ShoppingBag className="w-4 h-4" />
                 Checkout

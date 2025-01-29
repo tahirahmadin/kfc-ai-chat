@@ -46,10 +46,10 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="p-6 bg-orange-50">
+        <div className="p-6 bg-red-50">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
-              <User className="w-8 h-8 text-orange-500" />
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+              <User className="w-8 h-8 text-red-500" />
             </div>
             <div>
               <h3 className="font-semibold text-gray-800">Gobbl foodie</h3>
@@ -69,10 +69,10 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({
           <div className="bg-white rounded-xl p-3 shadow-sm">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Gobbl Points</span>
-              <span className="text-orange-500 font-semibold">2,450</span>
+              <span className="text-red-500 font-semibold">2,450</span>
             </div>
-            <div className="mt-2 h-2 bg-orange-100 rounded-full overflow-hidden">
-              <div className="h-full w-3/4 bg-orange-500 rounded-full" />
+            <div className="mt-2 h-2 bg-red-100 rounded-full overflow-hidden">
+              <div className="h-full w-3/4 bg-red-500 rounded-full" />
             </div>
             <p className="text-xs text-gray-500 mt-1">
               550 points until next reward
@@ -93,7 +93,7 @@ export const SlidePanel: React.FC<SlidePanelProps> = ({
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-3 p-3 rounded-xl transition-colors ${
                   activeTab === tab.id
-                    ? "bg-orange-50 text-orange-500"
+                    ? "bg-red-50 text-red-500"
                     : "hover:bg-gray-50"
                 }`}
               >
