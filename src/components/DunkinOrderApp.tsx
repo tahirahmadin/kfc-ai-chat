@@ -29,6 +29,7 @@ export const DunkinOrderApp: React.FC = () => {
   const [isSpeechEnabled, setIsSpeechEnabled] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const speechService = useMemo(() => new SpeechService(), []);
+  const isSpeechSupported = useMemo(() => speechService.isSupported(), [speechService]);
 
   // Replace with your DeepSeek API endpoint and API key
   const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"; // Example endpoint
@@ -209,6 +210,8 @@ export const DunkinOrderApp: React.FC = () => {
   
   // Function to toggle speech recognition
   const toggleSpeechRecognition = () => {
+    if (!isSpeechSupported) return;
+    
     if (isSpeechEnabled) {
       speechService.stopListening();
       setIsSpeechEnabled(false);
@@ -220,6 +223,7 @@ export const DunkinOrderApp: React.FC = () => {
         (error) => {
           console.error(error);
           setIsSpeechEnabled(false);
+          setInterimTranscript('');
           dispatch({
             type: "ADD_MESSAGE",
             payload: {
@@ -532,6 +536,7 @@ export const DunkinOrderApp: React.FC = () => {
           isLoading={state.isLoading}
           queryType={state.currentQueryType}
           isSpeechEnabled={isSpeechEnabled}
+          isSpeechSupported={isSpeechSupported}
           onSpeechToggle={toggleSpeechRecognition}
           interimTranscript={interimTranscript}
         />

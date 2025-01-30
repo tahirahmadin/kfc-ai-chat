@@ -12,9 +12,11 @@ interface ChatPanelProps {
   setInput: (value: string) => void;
   onSubmit: (e: React.FormEvent, serializedMemory: string) => void;
   placeholder: string;
+  isLoading?: boolean;
   onImageUpload: (file: File) => void;
   isImageAnalyzing: boolean;
   isSpeechEnabled?: boolean;
+  isSpeechSupported?: boolean; 
   onSpeechToggle?: () => void;
   interimTranscript?: string;
 }
@@ -28,6 +30,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   isImageAnalyzing,
   isLoading = false,
   isSpeechEnabled = false,
+  isSpeechSupported = false,
   onSpeechToggle = () => {},
   interimTranscript = '',
 }) => {
@@ -227,6 +230,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         placeholder={placeholder}
         isLoading={isLoading}
         isSpeechEnabled={isSpeechEnabled}
+        isSpeechSupported={isSpeechSupported}
         onSpeechToggle={onSpeechToggle}
         interimTranscript={interimTranscript}
       />

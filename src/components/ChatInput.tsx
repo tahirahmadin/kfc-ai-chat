@@ -23,6 +23,7 @@ interface ChatInputProps {
   placeholder?: string;
   showQuickActions?: boolean;
   isSpeechEnabled?: boolean;
+  isSpeechSupported?: boolean;
   onSpeechToggle?: () => void;
   interimTranscript?: string;
 }
@@ -37,6 +38,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   placeholder = "Type a message...",
   showQuickActions = true,
   isSpeechEnabled = false,
+  isSpeechSupported = false,
   onSpeechToggle = () => {},
   interimTranscript = "",
 }) => {
@@ -113,29 +115,32 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       <form onSubmit={onSubmit} className="flex items-center gap-2">
         <input
           type="text"
-          placeholder={placeholder}
+          placeholder={isSpeechEnabled ? "Listening..." : placeholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          disabled={isLoading || isSpeechEnabled}
-          className="flex-1 p-2 rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-red-600 backdrop-blur-sm placeholder:text-gray-500 disabled:opacity-50"
+          className="flex-1 p-2 rounded-lg bg-white/50 focus:outline-none focus:ring-2 focus:ring-red-600 
+                     backdrop-blur-sm placeholder:text-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
         />
-        {/* Add microphone button */}
-        <button
-          type="button"
-          onClick={onSpeechToggle}
-          className={`p-2 rounded-full transition-colors ${
-            isSpeechEnabled
-              ? 'bg-black hover:bg-black'
-              : 'bg-[#cc1c1c] hover:bg-red-600'
-          } text-white`}
-          title={isSpeechEnabled ? "Stop listening" : "Start voice input"}
-        >
-          {isSpeechEnabled ? (
-            <MicOff className="w-5 h-5" />
-          ) : (
-            <Mic className="w-5 h-5" />
-          )}
-        </button>
+
+        {/* Microphone button with better accessibility */}
+        {isSpeechSupported && (
+          <button
+            type="button"
+            onClick={onSpeechToggle}
+            aria-label={isSpeechEnabled ? "Stop voice input" : "Start voice input"}
+            aria-pressed={isSpeechEnabled}
+            className={`p-2 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+              ${isSpeechEnabled 
+                ? 'bg-black hover:bg-gray-800 text-white' 
+                : 'bg-[#cc1c1c] hover:bg-red-600 text-white'}`}
+          >
+            {isSpeechEnabled ? (
+              <MicOff className="w-5 h-5" aria-hidden="true" />
+            ) : (
+              <Mic className="w-5 h-5" aria-hidden="true" />
+            )}
+          </button>
+        )}
         
         <label className="cursor-pointer p-2 bg-[#cc1c1c] hover:bg-red-600 rounded-full text-white transition-colors">
           <input
