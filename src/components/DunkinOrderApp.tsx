@@ -9,7 +9,7 @@ import { CartSummary } from "./CartSummary";
 import { QueryType } from "../context/ChatContext";
 import { menuItems } from "../data/menuData";
 import { ImageService } from "../services/imageService";
-import { SpeechService, SpeechRecognitionResult } from '../services/speechService';
+import { SpeechService, SpeechRecognitionResult } from "../services/speechService";
 import axios from "axios";
 const chatService = new ChatService();
 
@@ -27,15 +27,21 @@ export const DunkinOrderApp: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isImageAnalyzing, setIsImageAnalyzing] = useState(false);
   const [isSpeechEnabled, setIsSpeechEnabled] = useState(false);
-  const [interimTranscript, setInterimTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState("");
   const speechService = useMemo(() => new SpeechService(), []);
   const isSpeechSupported = useMemo(() => speechService.isSupported(), [speechService]);
 
-  // Replace with your DeepSeek API endpoint and API key
-  const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"; // Example endpoint
-  const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions"; // Example endpoint
-  const API_KEY = import.meta.env.VITE_PUBLIC_DEEPSEEK_KEY; // Replace with your actual API key
-  const OPENAI_KEY = import.meta.env.VITE_PUBLIC_OPENAI_API_KEY; // Replace with your actual API key
+  // We now use the full menu data (menuItems) without filtering.
+  const availableMenuItems = menuItems;
+
+  // If isVegOnly is true, add a conditional instruction to the prompt.
+  const vegInstruction = isVegOnly ? " Only suggest vegetarian items." : "";
+
+  // Replace with your API endpoints and keys
+  const DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions";
+  const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+  const API_KEY = import.meta.env.VITE_PUBLIC_DEEPSEEK_KEY;
+  const OPENAI_KEY = import.meta.env.VITE_PUBLIC_OPENAI_API_KEY;
 
   const imageService = new ImageService();
 
@@ -62,10 +68,8 @@ export const DunkinOrderApp: React.FC = () => {
     try {
       // Analyze image using OpenAI
       const imageDescription = await imageService.analyzeImage(file);
-
-      const prompt = `Here is the menu data: ${JSON.stringify(
-        menuItems
-      )}. Based on this image description: "${imageDescription}". Return the response in the format { "text": "", "items": [{ id: number, name: string, price: string }],"conclusion":"" }, where "text" is a creative/cleaver/funny information - in around 25 words and "items" is an array of matching menu items with only id, name, and price and "conclusion" is final short creative remark.. Include a maximum of 6 items and minimum 2 items - but be flexible with items count based on requirements. Do not include any additional text or explanations or format.`;
+      // Use the full menu data and add vegInstruction if isVegOnly is true.
+      const prompt = `Here is the menu data: ${JSON.stringify(menuItems)}.${vegInstruction} Based on this image description: "${imageDescription}". Return the response in the format { "text": "", "items": [{ id: number, name: string, price: string }], "conclusion": "" } where "text" is a creative/clever/funny information in around 25 words and "items" is an array of matching menu items (only id, name, and price) with a maximum of 6 items and a minimum of 2 items. Do not include any extra text or explanations.`;
 
       const response = await axios.post(
         OPENAI_API_URL,
@@ -127,7 +131,7 @@ export const DunkinOrderApp: React.FC = () => {
     try {
       speechService.stopListening();
       setIsSpeechEnabled(false);
-      setInterimTranscript('');
+      setInterimTranscript("");
       
       const transcript = result.transcript.trim();
       if (!transcript) return;
@@ -151,12 +155,8 @@ export const DunkinOrderApp: React.FC = () => {
   
       dispatch({ type: "SET_LOADING", payload: true });
   
-      // Simpler prompt to reduce token count
-      const prompt = `Here is the menu data: ${JSON.stringify(
-        menuItems
-      )}. Based on this, answer the user's query: ${transcript}. Return the response in the format strictly - { "text": "", "items": [{ "id": number, "name": string, "price": string }],"conclusion":"" }, where "text" is a creative/cleaver/funny information related to user query - in around 25 words and "items" is an array of matching menu items with only id, name, and price and "conclusion" is final short creative remark. Include a maximum of 6 items and minimum 2 items - but be flexible with items count based on requirements,if you find this is a greeting message from the user, like hey, how are you , hi etc or anything that is out of the menu reply accordingly and set "items" to [],also ignore menu items in that case and "conclusion" shoudl be "". Do not include any additional text or explanations or format type in response.`;
+      const prompt = `Here is the menu data: ${JSON.stringify(menuItems)}.${vegInstruction} Based on this, answer the user's query: ${transcript}. Return the response in the format strictly - { "text": "", "items": [{ "id": number, "name": string, "price": string }], "conclusion": "" } where "text" is a creative/clever/funny information related to user query in around 25 words and "items" is an array of matching menu items (only id, name, and price) with a maximum of 6 items and a minimum of 2 items. Do not include any extra text or explanations.`;
       
-  
       const response = await axios.post(
         OPENAI_API_URL,
         {
@@ -188,7 +188,7 @@ export const DunkinOrderApp: React.FC = () => {
       });
   
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       dispatch({
         type: "ADD_MESSAGE",
         payload: {
@@ -215,7 +215,7 @@ export const DunkinOrderApp: React.FC = () => {
     if (isSpeechEnabled) {
       speechService.stopListening();
       setIsSpeechEnabled(false);
-      setInterimTranscript('');
+      setInterimTranscript("");
     } else {
       setIsSpeechEnabled(true);
       speechService.startListening(
@@ -223,7 +223,7 @@ export const DunkinOrderApp: React.FC = () => {
         (error) => {
           console.error(error);
           setIsSpeechEnabled(false);
-          setInterimTranscript('');
+          setInterimTranscript("");
           dispatch({
             type: "ADD_MESSAGE",
             payload: {
@@ -403,7 +403,7 @@ export const DunkinOrderApp: React.FC = () => {
       return;
     }
 
-    // Determine query type
+    // Determine query type for regular chat message flow
     const queryType = chatService.determineQueryType(input.trim());
 
     // Create user message with query type
@@ -411,12 +411,8 @@ export const DunkinOrderApp: React.FC = () => {
       id: Date.now(),
       text: input.trim(),
       isBot: false,
-      time: new Date().toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      }),
-      queryType, // Include query type in message
+      time: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "numeric", hour12: true }),
+      queryType,
     };
 
     // Update state
@@ -426,72 +422,47 @@ export const DunkinOrderApp: React.FC = () => {
     dispatch({ type: "SET_LOADING", payload: true });
 
     try {
-      try {
-        const prompt = `Here is the menu data: ${JSON.stringify(
-          menuItems
-        )}. Based on this, answer the user's query: ${input}. Return the response in the format strictly - { "text": "", "items": [{ "id": number, "name": string, "price": string }],"conclusion":"" }, where "text" is a creative/cleaver/funny information related to user query - in around 25 words and "items" is an array of matching menu items with only id, name, and price and "conclusion" is final short creative remark. Include a maximum of 6 items and minimum 2 items - but be flexible with items count based on requirements. Do not include any additional text or explanations or format type in response.`;
-        // Call the DeepSeek API with the correct request format
-        const response = await axios.post(
-          OPENAI_API_URL,
-          {
-            model: "gpt-4o", // Specify the model you're using
-            messages: [
-              {
-                role: "user",
-                content: prompt,
-              },
-            ],
-            max_tokens: 500, // Adjust based on your needs
+      const prompt = `Here is the menu data: ${JSON.stringify(menuItems)}.${vegInstruction} Based on this, answer the user's query: ${input}. Return the response in the format strictly - { "text": "", "items": [{ "id": number, "name": string, "price": string }], "conclusion": "" } where "text" is a creative/clever/funny information in around 25 words and "items" is an array of matching menu items (only id, name, and price) with a maximum of 5 items and a minimum of 2 items. STRICT FORMAT RULES:
+      - DO NOT include any markdown formatting.
+      - DO NOT include explanations or additional text.
+      - Only return a valid JSON object, nothing else.`;
+
+      const response = await axios.post(
+        OPENAI_API_URL,
+        {
+          model: "gpt-4o",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: 500,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${OPENAI_KEY}`,
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${OPENAI_KEY}`,
-            },
-          }
-        );
+        }
+      );
 
-        // Parse the API response
-        const apiResponseText = response.data.choices[0].message.content;
-        console.log(apiResponseText);
-        // const apiResponse = JSON.parse(apiResponseText) as ApiResponse;
-        // setResponse(apiResponse);
+      const apiResponseText = response.data.choices[0].message.content;
+      console.log(apiResponseText);
 
-        // Create bot message
-        const botMessage = {
-          id: Date.now() + 1,
-          text: apiResponseText,
-          isBot: true,
-          time: new Date().toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "numeric",
-            hour12: true,
-          }),
-          queryType, // Keep the same query type for the response
-        };
+      const botMessage = {
+        id: Date.now() + 1,
+        text: apiResponseText,
+        isBot: true,
+        time: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "numeric", hour12: true }),
+        queryType,
+      };
 
-        // Add bot message to chat
-        dispatch({ type: "ADD_MESSAGE", payload: botMessage });
-      } catch (error) {
-        console.error("Error calling DeepSeek API:", error);
-      } finally {
-        // setIsLoading(false);
-      }
+      dispatch({ type: "ADD_MESSAGE", payload: botMessage });
     } catch (error) {
       console.error("Error querying menu:", error);
-
-      // Add error message
       dispatch({
         type: "ADD_MESSAGE",
         payload: {
           id: Date.now() + 1,
           text: "Sorry, I had trouble understanding your question. Please try again.",
           isBot: true,
-          time: new Date().toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "numeric",
-            hour12: true,
-          }),
+          time: new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "numeric", hour12: true }),
           queryType: QueryType.GENERAL,
         },
       });
@@ -500,7 +471,6 @@ export const DunkinOrderApp: React.FC = () => {
     }
   };
 
-  // Helper function to get appropriate placeholder text based on current query type
   const getInputPlaceholder = () => {
     switch (state.currentQueryType) {
       case QueryType.MENU_QUERY:
@@ -516,7 +486,6 @@ export const DunkinOrderApp: React.FC = () => {
         <Header
           onOpenPanel={() => setIsPanelOpen(true)}
           onCartClick={() => setIsCartOpen(!isCartOpen)}
-          // queryType={state.currentQueryType}
         />
 
         <Filters
@@ -550,41 +519,29 @@ export const DunkinOrderApp: React.FC = () => {
         onDeleteAddress={() => {}}
       />
 
-      {/* Cart Summary */}
       {isCartOpen && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-slide-up">
             <div className="p-4 bg-red-50 border-b flex justify-between items-center">
               <h2 className="font-semibold text-gray-800">Your Cart</h2>
-              <button
-                onClick={() => setIsCartOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
+              <button onClick={() => setIsCartOpen(false)} className="text-gray-500 hover:text-gray-700">
                 ×
               </button>
             </div>
 
             <div className="max-h-[60vh] overflow-y-auto p-4 space-y-4">
               {state.cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
-                >
+                <div key={item.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-800">{item.name}</h3>
-                    <p className="text-sm text-gray-500">
-                      ${item.price} × {item.quantity}
-                    </p>
+                    <p className="text-sm text-gray-500">${item.price} × {item.quantity}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() =>
                         dispatch({
                           type: "UPDATE_CART_ITEM",
-                          payload: {
-                            ...item,
-                            quantity: Math.max(0, item.quantity - 1),
-                          },
+                          payload: { ...item, quantity: Math.max(0, item.quantity - 1) },
                         })
                       }
                       className="p-1 hover:bg-gray-200 rounded"
@@ -613,14 +570,7 @@ export const DunkinOrderApp: React.FC = () => {
                 <div className="flex justify-between mb-4">
                   <span className="font-medium">Total</span>
                   <span className="font-bold text-red-500">
-                    $
-                    {state.cart
-                      .reduce(
-                        (total, item) =>
-                          total + parseFloat(item.price) * item.quantity,
-                        0
-                      )
-                      .toFixed(2)}
+                    ${state.cart.reduce((total, item) => total + parseFloat(item.price) * item.quantity, 0).toFixed(2)}
                   </span>
                 </div>
                 <button
@@ -634,9 +584,7 @@ export const DunkinOrderApp: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="p-8 text-center text-gray-500">
-                Your cart is empty
-              </div>
+              <div className="p-8 text-center text-gray-500">Your cart is empty</div>
             )}
           </div>
         </div>
